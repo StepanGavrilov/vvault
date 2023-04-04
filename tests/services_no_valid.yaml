@@ -1,0 +1,54 @@
+---
+environments:
+  dev:
+    services:
+      db:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: '1'
+        POSTGRES_BD: postgres
+  prod:
+    services:
+      db:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: '1'
+        POSTGRES_BD: postgres
+policy:
+  dev:
+    db_access:
+      path:
+        dev/*:
+          capabilities:
+            - read
+            - list
+        dev/db/*:
+          capabilities:
+            - read
+            - list
+        sys/mounts/:
+          capabilities:
+            - read
+            - list
+  prod:
+  db_access:
+        path:
+      dev/*:
+          capabilities:
+            - read
+            - list
+        dev/db/*:
+          capabilities:
+            - read
+            - list
+        sys/mounts/:
+          capabilities:
+            - read
+            - list
+acl:
+  dev_db_cl:
+    password: adminadminadmin
+    polices:
+      - 'dev/db_access'
+  prod_db_cl:
+    password: adminadminadmin
+    polices:
+      - 'dev/db_access'

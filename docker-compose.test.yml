@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+
+  vault-test-app:
+    container_name: "vault-test-app_${CONTOUR}"
+    build:
+      dockerfile: Dockerfile
+    entrypoint: "${API_ENTRYPOINT}"
+
+networks:
+  inner_net:
