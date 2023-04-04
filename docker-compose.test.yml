@@ -5,6 +5,7 @@ services:
   vault-test-app:
     container_name: "vault-test-app_${CONTOUR}"
     build:
+      context: .
       dockerfile: Dockerfile
     entrypoint: "${API_ENTRYPOINT}"
 
