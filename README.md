@@ -4,8 +4,6 @@ VVault
 
 # Stats
 
-# Python parallel task-queue with redis
-
 
 Based on
 * hvac
