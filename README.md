@@ -9,6 +9,21 @@ Based on
 * hvac
 * vault
 
+Start
+==
+poetry
+```shell
+poetry add vvault
+```
+pip
+```shell
+pip install vvault
+```
+import
+```python
+from vvault.vault import VaultMaster
+```
+
 Config for vault (services.yaml)
 ==
 ```yaml
