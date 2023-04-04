@@ -73,7 +73,9 @@ class VaultMaster:
         logger.info("Initializing")
         vault_init_data: dict[str, Any] = self.client.sys.initialize(5, 3)
         # Get vault init data
-        self.__unseal_keys: tuple[str] = tuple(vault_init_data.get("keys", None))  # type: ignore
+        self.__unseal_keys: tuple[str] = tuple(
+            vault_init_data.get("keys", None)
+        )  # type: ignore
         self.__root_token = vault_init_data.get("root_token", None)
         logger.info(f"root token: {self.__root_token}")
         logger.info(f"unseal keys (5): {self.__unseal_keys}")
@@ -124,7 +126,11 @@ class VaultMaster:
             return
         for acl in acls:
             acl_data: dict = acls.get(acl)  # type: ignore
-            self.create_userpass(username=acl, password=acl_data.get("password"), policies=acl_data.get("polices", []))  # type: ignore
+            self.create_userpass(
+                username=acl,
+                password=acl_data.get("password"),  # type: ignore
+                policies=acl_data.get("polices", []),
+            )  # type: ignore
         logger.info("Finished Creating UserPass")
 
     def enable_auth_methods(self, auth_methods: tuple[str, ...]) -> None:
@@ -224,7 +230,9 @@ class VaultMaster:
 
         try:
             logger.info(
-                f'Statuses: initialized: {self.client.seal_status.get("initialized")} | sealed: {self.client.seal_status.get("sealed")}'
+                f"Statuses: initialized:"
+                f' {self.client.seal_status.get("initialized")}'
+                f' | sealed: {self.client.seal_status.get("sealed")}'
             )
         except InvalidSchema:
             logger.error("No connection to vault!")

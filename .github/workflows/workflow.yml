@@ -1,0 +1,53 @@
+name: CICD
+on:
+  push:
+    branches:
+      - '*'
+      - '*/*'
+      - '**'
+
+jobs:
+
+  linter:
+    name: linter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Installing flake
+        run: pip install flake8
+      - name: Installing black
+        run: pip install black
+      - name: Check black
+        run: black . --check --verbose --diff --color
+      - name: Check flake8
+        run: flake8 vvault
+
+  static:
+    name: static
+    needs: linter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Installing mypy
+        run: pip install mypy
+      - name: Installing mypy types
+        run: mypy --install-types --non-interactive vvault/
+      - name: Check mypy
+        run: mypy vvault
+
+  integrations-testing:
+    name: integrations-testing
+    needs: static
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Run tests
+        run: DOCKER_BUILDKIT=1 ./entrypoint.sh Test
