@@ -9,7 +9,7 @@ Based on
 * hvac
 * vault
 
-Config for vault
+Config for vault (services.yaml)
 ==
 ```yaml
 ---
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         url="http://localhost:8200", auth_methods=("approle", "userpass")
     )
     response = vault.start(
-        root_token=None, unseal_keys=None, config_file=Path("../services.yaml")
+        root_token=None, unseal_keys=None, config_file=Path("services.yaml")
     )
     print(f"response: {response}")
 ```
