@@ -3,7 +3,7 @@ VVault
 
 
 # Stats
-
+<img src="https://img.shields.io/pypi/dm/vvault?style=for-the-badge" alt="pypi">
 
 Based on
 * hvac
