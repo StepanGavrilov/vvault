@@ -95,7 +95,7 @@ class VaultMaster:
         logger.info("Initializing")
         vault_init_data: dict[str, Any] = self.client.sys.initialize(5, 3)
         # Get vault init data
-        self.__unseal_keys: tuple[str] = tuple(
+        self.__unseal_keys: tuple[str, ...] = tuple(
             vault_init_data.get("keys", None)
         )  # type: ignore
         self.__root_token = vault_init_data.get("root_token", None)
@@ -235,7 +235,7 @@ class VaultMaster:
         )
 
     def __start(
-        self, root_token: str | None, unseal_keys: tuple[str] | None, update: bool
+        self, root_token: str | None, unseal_keys: tuple[str, ...] | None, update: bool
     ) -> dict[str, str | tuple[str, ...] | None]:
         if root_token:
             self.__root_token = root_token
