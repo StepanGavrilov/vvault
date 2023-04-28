@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vvault"
-version = "0.0.2"
+version = "0.0.3"
 readme = "README.md"
 packages = [{include = "vvault"}]
 authors = ["StepanGavrilov <gavrilovstepan78@gmail.com>"]
