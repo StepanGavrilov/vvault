@@ -39,23 +39,45 @@ class VaultMaster:
         userpass_data = self.client.auth.userpass.list_user()
         return userpass_data.get("data", {}).get("keys")
 
+    def __initialize(self):
+        ...
+
+    def __unseal(self):
+        logger.info("Unsealing")
+        self.client.sys.submit_unseal_keys(self.__unseal_keys[0:3])
+        logger.info(f'initialized: {self.client.seal_status.get("initialized")}')
+        logger.info(f'sealed: {self.client.seal_status.get("sealed")}')
+        self.client = hvac.Client(url=self.url, token=self.__root_token)
+        logger.info(
+            f"Client authenticated (master token): {self.client.is_authenticated()}"
+        )
+
+        # enable auth methods
+        self.enable_auth_methods(auth_methods=self._auth_methods)
+
+        self.__init_config()
+
     def start(
         self,
         config_file: Path,
-        unseal_keys: tuple[str] | None = None,
+        unseal_keys: tuple[str, ...] | None = None,
         root_token=None,
+        update: bool = False,
     ) -> dict:
         """
         :param config_file: required
         :param unseal_keys:
         :param root_token: optional, if it's not first start
+        :param update: optional, set True if we need updates from config
         """
 
         if not config_file.exists():
             raise FileNotFoundError(f"No config file by path: {config_file}")
 
         self.__parse_config_file(config_file)
-        start_response = self.__start(root_token=root_token, unseal_keys=unseal_keys)
+        start_response = self.__start(
+            root_token=root_token, unseal_keys=unseal_keys, update=update
+        )
         return start_response
 
     def __parse_config_file(self, config_file: Path) -> None:
@@ -73,18 +95,12 @@ class VaultMaster:
         logger.info("Initializing")
         vault_init_data: dict[str, Any] = self.client.sys.initialize(5, 3)
         # Get vault init data
-        self.__unseal_keys: tuple[str] = tuple(
+        self.__unseal_keys: tuple[str, ...] = tuple(
             vault_init_data.get("keys", None)
         )  # type: ignore
         self.__root_token = vault_init_data.get("root_token", None)
         logger.info(f"root token: {self.__root_token}")
         logger.info(f"unseal keys (5): {self.__unseal_keys}")
-
-    def __unseal(self) -> None:
-        logger.info("Unsealing")
-        self.client.sys.submit_unseal_keys(self.__unseal_keys[0:3])
-        logger.info(f'initialized: {self.client.seal_status.get("initialized")}')
-        logger.info(f'sealed: {self.client.seal_status.get("sealed")}')
 
     def __init_config(self) -> None:
         """
@@ -219,7 +235,7 @@ class VaultMaster:
         )
 
     def __start(
-        self, root_token: str | None, unseal_keys: tuple[str] | None
+        self, root_token: str | None, unseal_keys: tuple[str, ...] | None, update: bool
     ) -> dict[str, str | tuple[str, ...] | None]:
         if root_token:
             self.__root_token = root_token
@@ -245,14 +261,16 @@ class VaultMaster:
         # if init (need root token and unsealed keys from input)
         if self.client.seal_status.get("sealed"):
             self.__unseal()
+
         self.client = hvac.Client(url=self.url, token=self.__root_token)
+
+        if update:
+            logger.info(f"Updating config: {update}")
+            self.__init_config()
+
         logger.info(
             f"Client authenticated (master token): {self.client.is_authenticated()}"
         )
-
-        # enable auth methods
-        self.enable_auth_methods(auth_methods=self._auth_methods)
-        self.__init_config()
 
         return {
             "root_token": self.__root_token,
