@@ -55,8 +55,6 @@ class VaultMaster:
         # enable auth methods
         self.enable_auth_methods(auth_methods=self._auth_methods)
 
-        self.__init_config()
-
     def start(
         self,
         config_file: Path,
@@ -257,9 +255,11 @@ class VaultMaster:
         # first start
         if not self.client.seal_status.get("initialized"):
             self.__init()
+            self.__unseal()
+            self.__init_config()
 
         # if init (need root token and unsealed keys from input)
-        if self.client.seal_status.get("sealed"):
+        elif self.client.seal_status.get("sealed"):
             self.__unseal()
 
         self.client = hvac.Client(url=self.url, token=self.__root_token)
